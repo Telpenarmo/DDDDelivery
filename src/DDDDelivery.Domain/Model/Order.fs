@@ -13,17 +13,18 @@ module Order =
           discount: float }
 
     type CancellationReason = { reason: string }
+    type ShipmentId = { id: string }
 
     type OrderStatus =
         | Pending
         | Processed
         | Awaiting
-        | Shipped
+        | Shipped of ShipmentId
         | Delivered
         | CancelledByBuyer of CancellationReason
         | CancelledBySeller of CancellationReason
 
-    [<NoEquality; NoComparison>]
+    [<CustomEquality; NoComparison>]
     type Order =
         { id: OrderId
           status: OrderStatus
@@ -34,12 +35,19 @@ module Order =
           expectedShipmentTime: DateTime
           modifiedAt: DateTime }
 
-    let cancellable =
+        override this.Equals(other) =
+            match other with
+            | :? Order as o -> this.id = o.id
+            | _ -> false
+
+        override this.GetHashCode() = this.id.GetHashCode()
+
+    let (|Cancellable|NotCancellable|) =
         function
         | Delivered
         | CancelledByBuyer _
-        | CancelledBySeller _ -> false
-        | _ -> true
+        | CancelledBySeller _ -> Cancellable
+        | _ -> NotCancellable
 
     let internal create id customerId orderLines expectedDeliveryDays =
         { id = id
@@ -48,20 +56,19 @@ module Order =
           orderLines = orderLines
           orderTime = DateTime.Now
           expectedShipmentTime =
-            DateTime.Now
-            + TimeSpan.FromDays expectedDeliveryDays
+            let expectedDeliveryTime = expectedDeliveryDays |> TimeSpan.FromDays
+            DateTime.Now + expectedDeliveryTime
           modifiedAt = DateTime.Now }
 
-    module Lens =
-        let changeStatus f order =
+    module Commands =
+        type Command = Order -> Order option
+
+        let private changeStatus f order =
             f order.status
             |> Option.map (fun status ->
                 { order with
                     modifiedAt = DateTime.Now
                     status = status })
-
-    module Commands =
-        type Command = Order -> Order option
 
         let private advanceTo next expected actual =
             if actual = expected then
@@ -71,13 +78,11 @@ module Order =
 
         let private cancel newStatus : Command =
             let tryCancel =
-                fun status ->
-                    if cancellable status then
-                        Some(newStatus)
-                    else
-                        None
+                function
+                | Cancellable -> Some newStatus
+                | NotCancellable -> None
 
-            Lens.changeStatus tryCancel
+            changeStatus tryCancel
 
         let buyerCancelled reason =
             CancelledByBuyer { reason = reason } |> cancel
@@ -85,10 +90,17 @@ module Order =
         let sellerCancelled reason =
             CancelledBySeller { reason = reason } |> cancel
 
-        let accepted: Command = Lens.changeStatus (Pending |> advanceTo Processed)
+        let accepted: Command = changeStatus (Pending |> advanceTo Processed)
 
-        let prepared: Command = Lens.changeStatus (Processed |> advanceTo Awaiting)
+        let prepared: Command = changeStatus (Processed |> advanceTo Awaiting)
 
-        let shipped: Command = Lens.changeStatus (Awaiting |> advanceTo Shipped)
+        let shipped shipmentId : Command =
+            changeStatus (Awaiting |> advanceTo (Shipped shipmentId))
 
-        let delivered: Command = Lens.changeStatus (Shipped |> advanceTo Delivered)
+        let delivered: Command =
+            let tryDeliver =
+                function
+                | Shipped _ -> Some Delivered
+                | _ -> None
+
+            changeStatus tryDeliver
