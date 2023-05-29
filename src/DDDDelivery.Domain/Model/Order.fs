@@ -20,7 +20,8 @@ module Order =
         | Awaiting
         | Shipped
         | Delivered
-        | Cancelled of CancellationReason
+        | CancelledByBuyer of CancellationReason
+        | CancelledBySeller of CancellationReason
 
     [<NoEquality; NoComparison>]
     type Order =
@@ -36,7 +37,8 @@ module Order =
     let cancellable =
         function
         | Delivered
-        | Cancelled _ -> false
+        | CancelledByBuyer _
+        | CancelledBySeller _ -> false
         | _ -> true
 
     let internal create id customerId orderLines expectedDeliveryDays =
@@ -67,20 +69,26 @@ module Order =
             else
                 None
 
-        let cancel reason : Command =
+        let private cancel newStatus : Command =
             let tryCancel =
                 fun status ->
                     if cancellable status then
-                        Some(Cancelled { reason = reason })
+                        Some(newStatus)
                     else
                         None
 
             Lens.changeStatus tryCancel
 
-        let accept: Command = Lens.changeStatus (Pending |> advanceTo Processed)
+        let buyerCancelled reason =
+            CancelledByBuyer { reason = reason } |> cancel
 
-        let prepare: Command = Lens.changeStatus (Processed |> advanceTo Awaiting)
+        let sellerCancelled reason =
+            CancelledBySeller { reason = reason } |> cancel
 
-        let ship: Command = Lens.changeStatus (Awaiting |> advanceTo Shipped)
+        let accepted: Command = Lens.changeStatus (Pending |> advanceTo Processed)
 
-        let deliver: Command = Lens.changeStatus (Shipped |> advanceTo Delivered)
+        let prepared: Command = Lens.changeStatus (Processed |> advanceTo Awaiting)
+
+        let shipped: Command = Lens.changeStatus (Awaiting |> advanceTo Shipped)
+
+        let delivered: Command = Lens.changeStatus (Shipped |> advanceTo Delivered)

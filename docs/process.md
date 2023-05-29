@@ -11,9 +11,11 @@ Orders cannot be divided to be shipped separately.
 Orders are tracked through their whole lifecycle, from being requested to shipped or cancelled.
 
 DDDDelivery provides its users with methods to manage that lifecycle.
-The system is designed in a way enabling easy automation of that management and integration with external systems, i.e. e-shops and payment providers.
+It exposes a REST API, which enables easy automation of that management and integration with external systems, i.e. e-shops and payment providers.
+This API is intended to be integrated wih customer-facing applications like e-shops for submitting orders and their cancellation.
+A web-based UI is also provided to support the management of orders.
 
-DDDDelivery in MVP version does not distinguish between its users, so every one is "trusted", but not all-allowed.
+DDDDelivery in MVP version does not distinguish between its users.
 
 ### Orders lifecycle
 
@@ -24,7 +26,8 @@ Each order, as tracked by DDDDelivery, can be in exactly one of the following st
 - _awaiting_ shipment,
 - _shipped_,
 - _delivered_,
-- _cancelled_.
+- _cancelled by customer_,
+- _cancelled by seller_.
 
 Orders in the first three of those states are also referred to as _active_.
 
@@ -40,7 +43,7 @@ From _shipped_ state delivery can only be moved to _delivered_.
 
 Any other transitions are impossible.
 Noteworthily, _cancelled_ an _delivered_ states are final and are considered archived and immutable.
-In other words, any _active_ order can be cancelled or uplifted to the next state.
+In other words, any _active_ order can be cancelled -- by customer or by seller -- or uplifted to the next state.
 
 ## Providing statistics, analyses and reports
 
