@@ -4,6 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Model/Email.fs" />
     <Compile Include="Model/Product.fs" />
     <Compile Include="Model/Customer.fs" />
     <Compile Include="Model/Order.fs" />

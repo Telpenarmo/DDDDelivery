@@ -8,7 +8,6 @@ module Customer =
           city: string
           postalCode: string }
 
-    type Email = Email of string
     type Phone = Phone of string
 
     type ContactInfo =
