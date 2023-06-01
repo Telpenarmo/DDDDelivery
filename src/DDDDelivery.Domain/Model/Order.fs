@@ -26,21 +26,21 @@ module Order =
 
     [<CustomEquality; NoComparison>]
     type Order =
-        { id: OrderId
-          status: OrderStatus
-          customer: Customer.CustomerId
+        { Id: OrderId
+          Status: OrderStatus
+          Customer: Customer.CustomerId
           // TODO: shipment:
-          orderLines: OrderLine seq
-          orderTime: DateTime
-          expectedShipmentTime: DateTime
-          modifiedAt: DateTime }
+          OrderLines: OrderLine seq
+          OrderTime: DateTime
+          ExpectedShipmentTime: DateTime
+          ModifiedAt: DateTime }
 
         override this.Equals(other) =
             match other with
-            | :? Order as o -> this.id = o.id
+            | :? Order as o -> this.Id = o.Id
             | _ -> false
 
-        override this.GetHashCode() = this.id.GetHashCode()
+        override this.GetHashCode() = this.Id.GetHashCode()
 
     let (|Cancellable|NotCancellable|) =
         function
@@ -50,25 +50,25 @@ module Order =
         | _ -> NotCancellable
 
     let internal create id customerId orderLines expectedDeliveryDays =
-        { id = id
-          status = Pending
-          customer = customerId
-          orderLines = orderLines
-          orderTime = DateTime.Now
-          expectedShipmentTime =
+        { Id = id
+          Status = Pending
+          Customer = customerId
+          OrderLines = orderLines
+          OrderTime = DateTime.Now
+          ExpectedShipmentTime =
             let expectedDeliveryTime = expectedDeliveryDays |> TimeSpan.FromDays
             DateTime.Now + expectedDeliveryTime
-          modifiedAt = DateTime.Now }
+          ModifiedAt = DateTime.Now }
 
     module Commands =
         type Command = Order -> Order option
 
         let private changeStatus f order =
-            f order.status
+            f order.Status
             |> Option.map (fun status ->
                 { order with
-                    modifiedAt = DateTime.Now
-                    status = status })
+                    ModifiedAt = DateTime.Now
+                    Status = status })
 
         let private advanceTo next expected actual =
             if actual = expected then

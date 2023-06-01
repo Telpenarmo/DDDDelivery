@@ -4,22 +4,22 @@ module Product =
 
     type ProductId = ProductId of int64
 
-    type Availiability =
-        | Unavailable
-        | Infinite
+    type Availability =
         | Available of uint64
+        | Infinite
+        | Unavailable
 
-    [<CustomEquality; NoComparison>]
+    [<NoEquality; NoComparison>]
     type Product =
-        { id: ProductId
-          name: string
-          description: string
-          price: float
-          availableUnits: Availiability }
-        
-        override this.Equals(other) =
-            match other with
-            | :? Product as p -> this.id = p.id
-            | _ -> false
-        
-        override this.GetHashCode() = this.id.GetHashCode()
+        val Id: ProductId
+        val mutable Name: string
+        val mutable Description: string
+        val mutable Price: float
+        val mutable AvailableUnits: Availability
+
+        new(id: ProductId, name: string, description: string, price: float, availableUnits: Availability) =
+            { Id = id
+              Name = name
+              Description = description
+              Price = price
+              AvailableUnits = availableUnits }

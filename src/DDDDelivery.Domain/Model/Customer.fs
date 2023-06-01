@@ -14,16 +14,21 @@ module Customer =
         | Email of Email
         | Phone of Phone
 
-    [<CustomEquality; NoComparison>]
+    [<NoEquality; NoComparison>]
     type Customer =
-        { id: CustomerId
-          name: string
-          PrimaryContactInfo: ContactInfo
-          SecondaryContactInfo: ContactInfo }
+        val Id: CustomerId
+        val mutable Name: string
+        val mutable PrimaryContactInfo: ContactInfo
+        val mutable SecondaryContactInfo: ContactInfo option
 
-        override this.Equals(other) =
-            match other with
-            | :? Customer as c -> this.id = c.id
-            | _ -> false
+        new(id: CustomerId, name: string, primaryContactInfo: ContactInfo, secondaryContactInfo: ContactInfo option) =
+            { Id = id
+              Name = name
+              PrimaryContactInfo = primaryContactInfo
+              SecondaryContactInfo = secondaryContactInfo }
 
-        override this.GetHashCode() = this.id.GetHashCode()
+        new(id: CustomerId, name: string, contactInfo: ContactInfo) =
+            { Id = id
+              Name = name
+              PrimaryContactInfo = contactInfo
+              SecondaryContactInfo = None }
