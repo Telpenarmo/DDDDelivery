@@ -8,5 +8,10 @@
     <Compile Include="Model/Product.fs" />
     <Compile Include="Model/Customer.fs" />
     <Compile Include="Model/Order.fs" />
+    <Compile Include="Repositories/Specification.fs" />
+    <Compile Include="Repositories/IProductsRepository.fs" />
+    <Compile Include="Repositories/ICustomersRepository.fs" />
+    <Compile Include="Repositories/IOrdersRepository.fs" />
+    <Compile Include="Repositories/IUnitOfWork.fs" />
   </ItemGroup>
 </Project>
