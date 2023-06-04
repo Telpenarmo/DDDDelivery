@@ -2,6 +2,8 @@ namespace DDDDelivery.Domain.Repositories
 
 open DDDDelivery.Domain
 
+open System.Threading.Tasks
+
 open Specification
 
 type CreationData =
@@ -11,8 +13,8 @@ type CreationData =
       ExpectedDeliveryDays: int }
 
 type IOrdersRepository =
-    abstract member Insert: CreationData -> Order.Order
-    abstract member FindById: Order.OrderId -> Order.Order option
-    abstract member FindAll: Specification<Order.Order> -> seq<Order.Order>
-    abstract member Update: Order.Order -> bool
-    abstract member Delete: Order.OrderId -> bool
+    abstract member Insert: CreationData -> Task<Order.Order>
+    abstract member FindById: Order.OrderId -> Task<Order.Order option>
+    abstract member FindAll: Specification<Order.Order> -> Task<seq<Order.Order>>
+    abstract member Update: Order.Order -> Task<bool>
+    abstract member Delete: Order.OrderId -> Task<bool>
