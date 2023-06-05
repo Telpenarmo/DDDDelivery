@@ -8,7 +8,7 @@ module Order =
 
     type OrderLine =
         { product: Product.ProductId
-          amount: int
+          amount: uint64
           worth: float
           discount: float }
 
@@ -31,7 +31,7 @@ module Order =
           Customer: Customer.CustomerId
           // TODO: shipment:
           OrderLines: OrderLine seq
-          OrderTime: DateTime
+          OrderedAt: DateTime
           ExpectedShipmentTime: DateTime
           ModifiedAt: DateTime }
 
@@ -42,19 +42,22 @@ module Order =
 
         override this.GetHashCode() = this.Id.GetHashCode()
 
-    let (|Cancellable|NotCancellable|) =
+    let (|Active|Inactive|) =
         function
+        | Pending
+        | Processed
+        | Awaiting
+        | Shipped _ -> Active
         | Delivered
         | CancelledByBuyer _
-        | CancelledBySeller _ -> Cancellable
-        | _ -> NotCancellable
+        | CancelledBySeller _ -> Inactive
 
     let internal create id customerId orderLines expectedDeliveryDays =
         { Id = id
           Status = Pending
           Customer = customerId
           OrderLines = orderLines
-          OrderTime = DateTime.Now
+          OrderedAt = DateTime.Now
           ExpectedShipmentTime =
             let expectedDeliveryTime = expectedDeliveryDays |> TimeSpan.FromDays
             DateTime.Now + expectedDeliveryTime
@@ -79,8 +82,8 @@ module Order =
         let private cancel newStatus : Command =
             let tryCancel =
                 function
-                | Cancellable -> Some newStatus
-                | NotCancellable -> None
+                | Active -> Some newStatus
+                | Inactive -> None
 
             changeStatus tryCancel
 

@@ -9,6 +9,18 @@ module Product =
         | Infinite
         | Unavailable
 
+        static member (-)(availability, amount) =
+            match availability with
+            | Available a -> Available(a - amount) |> Some
+            | Infinite -> Some Infinite
+            | Unavailable -> None
+
+        static member (+)(availability, amount) =
+            match availability with
+            | Available a -> Available(a + amount)
+            | Infinite -> Infinite
+            | Unavailable -> Available amount
+
     [<NoEquality; NoComparison>]
     type Product =
         val Id: ProductId
