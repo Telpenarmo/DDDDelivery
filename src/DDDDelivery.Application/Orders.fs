@@ -23,10 +23,10 @@ module private Common =
 
 module OrderSpecifications =
     let baseSpec =
-        Specification.Specification<Order.Order>.Zero ()
-        |> SpecificationsFsharp.Include <@ fun (o: Order.Order) -> o.OrderLines @>
+        Specification.Specification<Order>.Zero ()
+        |> SpecificationsFsharp.Include <@ fun (o: Order) -> o.OrderLines @>
 
-    let OrderedProductsSpec (order: Order.Order) =
+    let OrderedProductsSpec (order: Order) =
         Specification.Specification<Product.Product>.Zero ()
         |> SpecificationsFsharp.Filter
             <@ fun (p: Product.Product) ->
@@ -38,18 +38,18 @@ module OrderSpecifications =
     let OrdersWithProductSpec (productId: Product.ProductId) =
         baseSpec
         |> SpecificationsFsharp.Filter
-            <@ fun (o: Order.Order) ->
+            <@ fun (o: Order) ->
                 o.OrderLines
                 |> Seq.exists (fun ol -> ol.product = productId) @>
 
     let OrdersFromCustomerSpec (customerId: Customer.CustomerId) =
         baseSpec
-        |> SpecificationsFsharp.Filter <@ fun (o: Order.Order) -> o.Customer = customerId @>
+        |> SpecificationsFsharp.Filter <@ fun (o: Order) -> o.Customer = customerId @>
 
     let StaleOrdersSpec status days =
         baseSpec
         |> SpecificationsFsharp.Filter
-            <@ fun (o: Order.Order) ->
+            <@ fun (o: Order) ->
                 o.Status = status
                 && DateTime.Now - o.OrderedAt > TimeSpan.FromDays(float days) @>
 
@@ -93,7 +93,7 @@ module OrderCancellation =
         | OrderNotFound
         | OrderNotCancellable
 
-    let private returnProducts (uow: IUnitOfWork) (order: Order.Order) =
+    let private returnProducts (uow: IUnitOfWork) (order: Order) =
         let returnProduct (product: Product.Product) =
             let orderLine =
                 order.OrderLines
@@ -108,7 +108,7 @@ module OrderCancellation =
             return ()
         }
 
-    let private cancel cancelCommand (uow: IUnitOfWork) ((Order.OrderId id) as orderId) =
+    let private cancel cancelCommand (uow: IUnitOfWork) ((OrderId id) as orderId) =
         let doCancel order =
             task {
                 uow.Orders.Update order |> ignore
@@ -139,7 +139,7 @@ module OrderAcceptance =
         | OrderNotFound
         | OrderNotAcceptable
 
-    let accept (uow: IUnitOfWork) ((Order.OrderId id) as orderId) =
+    let accept (uow: IUnitOfWork) ((OrderId id) as orderId) =
         let doAccept order =
             task {
                 let! _ = uow.Orders.Update order
@@ -164,7 +164,7 @@ module OrderPreparation =
         | OrderNotFound
         | OrderNotPreparable
 
-    let prepare (uow: IUnitOfWork) ((Order.OrderId id) as orderId) =
+    let prepare (uow: IUnitOfWork) ((OrderId id) as orderId) =
         let doPrepare order =
             task {
                 let! _ = uow.Orders.Update order
@@ -189,7 +189,7 @@ module OrderShipment =
         | OrderNotFound
         | OrderNotShippable
 
-    let ship shipmentId (uow: IUnitOfWork) ((Order.OrderId id) as orderId) =
+    let ship shipmentId (uow: IUnitOfWork) ((OrderId id) as orderId) =
         let doShip order =
             task {
                 let! _ = uow.Orders.Update order
@@ -214,7 +214,7 @@ module OrderDelivery =
         | OrderNotFound
         | OrderNotDeliverable
 
-    let deliver (uow: IUnitOfWork) ((Order.OrderId id) as orderId) =
+    let deliver (uow: IUnitOfWork) ((OrderId id) as orderId) =
         let doDeliver order =
             match Order.Commands.delivered order with
             | Some order -> Ok order
@@ -239,13 +239,13 @@ module OrdersFetching =
         OrdersFromCustomerSpec customerId |> fetch uow
 
     let PendingForThreeDays (uow: IUnitOfWork) =
-        StaleOrdersSpec Order.OrderStatus.Pending 3
+        StaleOrdersSpec OrderStatus.Pending 3
         |> fetch uow
 
     let ProcessingForFiveDays (uow: IUnitOfWork) =
-        StaleOrdersSpec Order.OrderStatus.InPreparation 5
+        StaleOrdersSpec OrderStatus.InPreparation 5
         |> fetch uow
 
     let AwaitingShipmentForTwoDays (uow: IUnitOfWork) =
-        StaleOrdersSpec Order.OrderStatus.AwaitingShipment 2
+        StaleOrdersSpec OrderStatus.AwaitingShipment 2
         |> fetch uow

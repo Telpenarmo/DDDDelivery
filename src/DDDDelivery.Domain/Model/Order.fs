@@ -2,20 +2,21 @@ namespace DDDDelivery.Domain
 
 open System
 
-module Order =
 
-    type OrderId = OrderId of int64
+type OrderId = OrderId of int64
 
-    type OrderLine =
-        { product: Product.ProductId
-          amount: uint64
-          worth: float
-          discount: float }
+type OrderLine =
+    { product: Product.ProductId
+      amount: uint64
+      worth: float
+      discount: float }
 
-    type CancellationReason = { reason: string }
-    type ShipmentId = { id: string }
+type CancellationReason = { reason: string }
+type ShipmentId = { id: string }
 
-    type OrderStatus =
+
+module OrderStatus =
+    type T =
         | Pending
         | InPreparation
         | AwaitingShipment
@@ -24,23 +25,26 @@ module Order =
         | CancelledByCustomer of CancellationReason
         | CancelledByStore of CancellationReason
 
-    [<CustomEquality; NoComparison>]
-    type Order =
-        { Id: OrderId
-          Status: OrderStatus
-          Customer: Customer.CustomerId
-          // TODO: shipment:
-          OrderLines: OrderLine seq
-          OrderedAt: DateTime
-          ExpectedShipmentTime: DateTime
-          ModifiedAt: DateTime }
+[<CustomEquality; NoComparison>]
+type Order =
+    { Id: OrderId
+      Status: OrderStatus.T
+      Customer: Customer.CustomerId
+      // TODO: shipment:
+      OrderLines: OrderLine seq
+      OrderedAt: DateTime
+      ExpectedShipmentTime: DateTime
+      ModifiedAt: DateTime }
 
-        override this.Equals(other) =
-            match other with
-            | :? Order as o -> this.Id = o.Id
-            | _ -> false
+    override this.Equals(other) =
+        match other with
+        | :? Order as o -> this.Id = o.Id
+        | _ -> false
 
-        override this.GetHashCode() = this.Id.GetHashCode()
+    override this.GetHashCode() = this.Id.GetHashCode()
+
+module Order =
+    open OrderStatus
 
     let (|Active|Inactive|) =
         function
