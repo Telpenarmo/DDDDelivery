@@ -76,7 +76,7 @@ module OrderCreation =
                     None
                 | None -> Some product.Id
 
-            let! products = uow.Products.FindAll(OrderSpecifications.OrderedProductsSpec order)
+            let! products = uow.Products.FindSpecified(OrderSpecifications.OrderedProductsSpec order)
             let unavailableProducts = products |> Seq.choose tryReserveProduct
 
             if unavailableProducts |> Seq.isEmpty then
@@ -102,7 +102,7 @@ module OrderCancellation =
             product.AvailableUnits <- product.AvailableUnits + orderLine.amount
 
         task {
-            let! products = uow.Products.FindAll(OrderedProductsSpec order)
+            let! products = uow.Products.FindSpecified(OrderedProductsSpec order)
             products |> Seq.iter returnProduct
             let! _ = uow.Products.UpdateMany products
             return ()
@@ -226,7 +226,7 @@ module OrdersFetcher =
 
     let private fetch (uow: IUnitOfWork) spec =
         task {
-            let! orders = uow.Orders.FindAll(spec)
+            let! orders = uow.Orders.FindSpecified(spec)
             return orders
         }
 

@@ -40,4 +40,4 @@ module Products =
         }
 
     let getProducts (uow: IUnitOfWork) =
-        uow.Products.FindAll(ProductsSpecifications.baseSpec ())
+        uow.Products.FindSpecified(ProductsSpecifications.baseSpec ())

@@ -41,4 +41,4 @@ module Customers =
         }
 
     let getCustomers (uow: IUnitOfWork) =
-        uow.Customers.FindAll(CustomersSpecifications.baseSpec ())
+        uow.Customers.FindSpecified(CustomersSpecifications.baseSpec ())
