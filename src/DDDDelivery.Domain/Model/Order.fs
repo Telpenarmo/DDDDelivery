@@ -17,12 +17,12 @@ module Order =
 
     type OrderStatus =
         | Pending
-        | Processed
-        | Awaiting
+        | InPreparation
+        | AwaitingShipment
         | Shipped of ShipmentId
         | Delivered
-        | CancelledByBuyer of CancellationReason
-        | CancelledBySeller of CancellationReason
+        | CancelledByCustomer of CancellationReason
+        | CancelledByStore of CancellationReason
 
     [<CustomEquality; NoComparison>]
     type Order =
@@ -45,12 +45,12 @@ module Order =
     let (|Active|Inactive|) =
         function
         | Pending
-        | Processed
-        | Awaiting
+        | InPreparation
+        | AwaitingShipment
         | Shipped _ -> Active
         | Delivered
-        | CancelledByBuyer _
-        | CancelledBySeller _ -> Inactive
+        | CancelledByCustomer _
+        | CancelledByStore _ -> Inactive
 
     let create id customerId orderLines expectedDeliveryDays =
         { Id = id
@@ -87,18 +87,18 @@ module Order =
 
             changeStatus tryCancel
 
-        let buyerCancelled reason =
-            CancelledByBuyer { reason = reason } |> cancel
+        let customerCancelled reason =
+            CancelledByCustomer { reason = reason } |> cancel
 
-        let sellerCancelled reason =
-            CancelledBySeller { reason = reason } |> cancel
+        let storeCancelled reason =
+            CancelledByStore { reason = reason } |> cancel
 
-        let accepted: Command = changeStatus (Pending |> advanceTo Processed)
+        let accepted: Command = changeStatus (Pending |> advanceTo InPreparation)
 
-        let prepared: Command = changeStatus (Processed |> advanceTo Awaiting)
+        let prepared: Command = changeStatus (InPreparation |> advanceTo AwaitingShipment)
 
         let shipped shipmentId : Command =
-            changeStatus (Awaiting |> advanceTo (Shipped shipmentId))
+            changeStatus (AwaitingShipment |> advanceTo (Shipped shipmentId))
 
         let delivered: Command =
             let tryDeliver =

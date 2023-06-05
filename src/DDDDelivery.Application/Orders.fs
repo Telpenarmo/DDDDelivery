@@ -76,7 +76,7 @@ module OrderCreation =
                     None
                 | None -> Some product.Id
 
-            let! products = uow.Products.FindSpecified(OrderSpecifications.OrderedProductsSpec order)
+            let! products = uow.Products.FindSpecified(OrderedProductsSpec order)
             let unavailableProducts = products |> Seq.choose tryReserveProduct
 
             if unavailableProducts |> Seq.isEmpty then
@@ -128,10 +128,10 @@ module OrderCancellation =
         }
 
     let cancelByCustomer reason =
-        cancel (Order.Commands.buyerCancelled reason)
+        cancel (Order.Commands.customerCancelled reason)
 
     let cancelBySeller reason =
-        cancel (Order.Commands.sellerCancelled reason)
+        cancel (Order.Commands.storeCancelled reason)
 
 module OrderAcceptance =
 
@@ -222,7 +222,7 @@ module OrderDelivery =
 
         updateOrder uow orderId (fun _ -> OrderNotFound) doDeliver
 
-module OrdersFetcher =
+module OrdersFetching =
 
     let private fetch (uow: IUnitOfWork) spec =
         task {
@@ -243,9 +243,9 @@ module OrdersFetcher =
         |> fetch uow
 
     let ProcessingForFiveDays (uow: IUnitOfWork) =
-        StaleOrdersSpec Order.OrderStatus.Processed 5
+        StaleOrdersSpec Order.OrderStatus.InPreparation 5
         |> fetch uow
 
     let AwaitingShipmentForTwoDays (uow: IUnitOfWork) =
-        StaleOrdersSpec Order.OrderStatus.Awaiting 2
+        StaleOrdersSpec Order.OrderStatus.AwaitingShipment 2
         |> fetch uow
