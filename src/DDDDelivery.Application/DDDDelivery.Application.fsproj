@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DDDDelivery.Domain\DDDDelivery.Domain.fsproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Compile Include="Customers.fs" />
+    <Compile Include="Products.fs" />
+    <Compile Include="Orders.fs" />
+  </ItemGroup>
 </Project>
