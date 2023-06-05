@@ -52,7 +52,7 @@ module Order =
         | CancelledByBuyer _
         | CancelledBySeller _ -> Inactive
 
-    let internal create id customerId orderLines expectedDeliveryDays =
+    let create id customerId orderLines expectedDeliveryDays =
         { Id = id
           Status = Pending
           Customer = customerId
