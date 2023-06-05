@@ -7,28 +7,28 @@ open DDDDelivery.Domain.Repositories
 open DDDDelivery.Infrastructure.Repositories.InMemory
 
 type CustomersRepository =
-    val mutable customers: Map<Customer.CustomerId, Customer.Customer>
+    val mutable customers: Map<CustomerId, Customer>
 
     new() = { customers = Map.empty }
 
 
     interface ICustomersRepository with
-        member this.Insert(customer: Customer.Customer) : Task<bool> =
+        member this.Insert(customer: Customer) : Task<bool> =
             this.customers <- this.customers.Add(customer.Id, customer)
             Task.FromResult(true)
 
-        member this.Delete(id: Customer.CustomerId) : Task<bool> =
+        member this.Delete(id: CustomerId) : Task<bool> =
             this.customers <- this.customers.Remove(id)
             Task.FromResult(true)
 
-        member this.FindById(id: Customer.CustomerId) : Task<Customer.Customer option> =
+        member this.FindById(id: CustomerId) : Task<Customer option> =
             this.customers
             |> Map.tryFind id
             |> Task.FromResult
 
-        member this.FindSpecified(spec: Specification.Specification<Customer.Customer>) : Task<seq<Customer.Customer>> =
+        member this.FindSpecified(spec: Specification.Specification<Customer>) : Task<seq<Customer>> =
             SpecificationEvaluator.evaluate spec this.customers.Values
 
-        member this.Update(customer: Customer.Customer) : Task<bool> =
+        member this.Update(customer: Customer) : Task<bool> =
             this.customers <- this.customers.Add(customer.Id, customer)
             Task.FromResult(true)

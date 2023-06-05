@@ -27,22 +27,22 @@ module OrderSpecifications =
         |> SpecificationsFsharp.Include <@ fun (o: Order) -> o.OrderLines @>
 
     let OrderedProductsSpec (order: Order) =
-        Specification.Specification<Product.Product>.Zero ()
+        Specification.Specification<Product>.Zero ()
         |> SpecificationsFsharp.Filter
-            <@ fun (p: Product.Product) ->
+            <@ fun (p: Product) ->
                 order.OrderLines
                 |> Seq.exists (fun ol -> ol.product = p.Id) @>
 
     let AllOrdersSpec () = baseSpec
 
-    let OrdersWithProductSpec (productId: Product.ProductId) =
+    let OrdersWithProductSpec (productId: ProductId) =
         baseSpec
         |> SpecificationsFsharp.Filter
             <@ fun (o: Order) ->
                 o.OrderLines
                 |> Seq.exists (fun ol -> ol.product = productId) @>
 
-    let OrdersFromCustomerSpec (customerId: Customer.CustomerId) =
+    let OrdersFromCustomerSpec (customerId: CustomerId) =
         baseSpec
         |> SpecificationsFsharp.Filter <@ fun (o: Order) -> o.Customer = customerId @>
 
@@ -58,14 +58,14 @@ open OrderSpecifications
 module OrderCreation =
 
     type CreationError =
-        | CustomerNotFound of Customer.CustomerId
-        | NotEnoughProductsAvailable of Product.ProductId seq
+        | CustomerNotFound of CustomerId
+        | NotEnoughProductsAvailable of ProductId seq
 
     let create (uow: IUnitOfWork) data =
         task {
             let! order = uow.Orders.Insert data
 
-            let tryReserveProduct (product: Product.Product) =
+            let tryReserveProduct (product: Product) =
                 let orderLine =
                     order.OrderLines
                     |> Seq.find (fun ol -> ol.product = product.Id)
@@ -94,7 +94,7 @@ module OrderCancellation =
         | OrderNotCancellable
 
     let private returnProducts (uow: IUnitOfWork) (order: Order) =
-        let returnProduct (product: Product.Product) =
+        let returnProduct (product: Product) =
             let orderLine =
                 order.OrderLines
                 |> Seq.find (fun ol -> ol.product = product.Id)

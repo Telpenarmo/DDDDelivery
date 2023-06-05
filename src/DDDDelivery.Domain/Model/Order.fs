@@ -6,7 +6,7 @@ open System
 type OrderId = OrderId of int64
 
 type OrderLine =
-    { product: Product.ProductId
+    { product: ProductId
       amount: uint64
       worth: float
       discount: float }
@@ -29,7 +29,7 @@ module OrderStatus =
 type Order =
     { Id: OrderId
       Status: OrderStatus.T
-      Customer: Customer.CustomerId
+      Customer: CustomerId
       // TODO: shipment:
       OrderLines: OrderLine seq
       OrderedAt: DateTime

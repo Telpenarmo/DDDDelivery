@@ -6,7 +6,7 @@ module CustomersSpecifications =
     open DDDDelivery.Domain.Repositories
 
     let baseSpec =
-        Specification.Specification<Customer.Customer>
+        Specification.Specification<Customer>
             .Zero
 
 module Customers =

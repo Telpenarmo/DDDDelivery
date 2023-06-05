@@ -8,7 +8,7 @@ open Specification
 
 type CreationData =
     { Id: OrderId option
-      CustomerId: Customer.CustomerId
+      CustomerId: CustomerId
       OrderLines: OrderLine seq
       ExpectedDeliveryDays: int }
 

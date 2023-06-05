@@ -1,12 +1,10 @@
 namespace DDDDelivery.Application
 
-open System
-
 open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
 
 module ProductsSpecifications =
-    let baseSpec = Specification.Specification<Product.Product>.Zero
+    let baseSpec = Specification.Specification<Product>.Zero
 
 
 module Products =
