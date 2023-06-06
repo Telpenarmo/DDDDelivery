@@ -31,7 +31,7 @@ module OrderSpecifications =
         |> SpecificationsFsharp.Filter
             <@ fun (p: Product) ->
                 order.OrderLines
-                |> Seq.exists (fun ol -> ol.product = p.Id) @>
+                |> Seq.exists (fun ol -> ol.Product = p.Id) @>
 
     let AllOrdersSpec () = baseSpec
 
@@ -40,7 +40,7 @@ module OrderSpecifications =
         |> SpecificationsFsharp.Filter
             <@ fun (o: Order) ->
                 o.OrderLines
-                |> Seq.exists (fun ol -> ol.product = productId) @>
+                |> Seq.exists (fun ol -> ol.Product = productId) @>
 
     let OrdersFromCustomerSpec (customerId: CustomerId) =
         baseSpec
@@ -68,9 +68,9 @@ module OrderCreation =
             let tryReserveProduct (product: Product) =
                 let orderLine =
                     order.OrderLines
-                    |> Seq.find (fun ol -> ol.product = product.Id)
+                    |> Seq.find (fun ol -> ol.Product = product.Id)
 
-                match product.AvailableUnits - orderLine.amount with
+                match product.AvailableUnits - orderLine.Amount with
                 | Some x ->
                     product.AvailableUnits <- x
                     None
@@ -97,9 +97,9 @@ module OrderCancellation =
         let returnProduct (product: Product) =
             let orderLine =
                 order.OrderLines
-                |> Seq.find (fun ol -> ol.product = product.Id)
+                |> Seq.find (fun ol -> ol.Product = product.Id)
 
-            product.AvailableUnits <- product.AvailableUnits + orderLine.amount
+            product.AvailableUnits <- product.AvailableUnits + orderLine.Amount
 
         task {
             let! products = uow.Products.FindSpecified(OrderedProductsSpec order)

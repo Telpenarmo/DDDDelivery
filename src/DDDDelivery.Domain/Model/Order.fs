@@ -6,13 +6,13 @@ open System
 type OrderId = OrderId of int64
 
 type OrderLine =
-    { product: ProductId
-      amount: uint64
-      worth: float
-      discount: float }
+    { Product: ProductId
+      Amount: uint64
+      Worth: float
+      Discount: float }
 
-type CancellationReason = { reason: string }
-type ShipmentId = { id: string }
+type CancellationReason = { Reason: string }
+type ShipmentId = { Id: string }
 
 
 module OrderStatus =
@@ -92,10 +92,10 @@ module Order =
             changeStatus tryCancel
 
         let customerCancelled reason =
-            CancelledByCustomer { reason = reason } |> cancel
+            CancelledByCustomer { Reason = reason } |> cancel
 
         let storeCancelled reason =
-            CancelledByStore { reason = reason } |> cancel
+            CancelledByStore { Reason = reason } |> cancel
 
         let accepted: Command = changeStatus (Pending |> advanceTo InPreparation)
 

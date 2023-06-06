@@ -21,9 +21,9 @@ module Email =
 [<AutoOpen>]
 module ContactInfo =
     type Address =
-        { street: string
-          city: string
-          postalCode: string }
+        { Street: string
+          City: string
+          PostalCode: string }
 
     type Phone = Phone of string
 
