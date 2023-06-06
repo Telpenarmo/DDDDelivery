@@ -23,7 +23,7 @@ type ProductsRepository =
         member this.FindById(id: ProductId) : Task<Product option> =
             this.products |> Map.tryFind id |> Task.FromResult
 
-        member this.FindSpecified(spec: Specification.Specification<Product>) : Task<seq<Product>> =
+        member this.FindSpecified(spec: Specification<Product>) : Task<seq<Product>> =
             SpecificationEvaluator.evaluate spec this.products.Values
 
         member this.Update(product: Product) : Task<bool> =

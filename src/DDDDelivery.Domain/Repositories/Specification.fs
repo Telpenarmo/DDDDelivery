@@ -3,39 +3,36 @@ namespace DDDDelivery.Domain.Repositories
 open System
 open System.Linq.Expressions
 
-module Specification =
+type private FuncExpression<'From, 'To> = Expression<Func<'From, 'To>>
 
-    type FuncExpression<'From, 'To> = Expression<Func<'From, 'To>>
+type Specification<'T> =
+    { Where: FuncExpression<'T, bool>
+      Includes: FuncExpression<'T, obj> seq
+      IncludeStrings: string seq
+      OrderBy: FuncExpression<'T, IComparable> seq
+      Skip: uint64
+      Take: uint64 option }
 
-    type Specification<'T> =
-        { Where: FuncExpression<'T, bool>
-          Includes: FuncExpression<'T, obj> seq
-          IncludeStrings: string seq
-          OrderBy: FuncExpression<'T, IComparable> seq
-          Skip: uint64
-          Take: uint64 option }
-
-        static member Zero() =
-            { Where =
-                Expression.Lambda<Func<'T, bool>>(
-                    Expression.Constant(true),
-                    [| Expression.Parameter(typeof<'T>, "_") |]
-                )
-              Includes = Seq.empty
-              IncludeStrings = Seq.empty
-              OrderBy = Seq.empty
-              Skip = 0UL
-              Take = None }
-
-    let Default (where, includes) =
-        { Where = where
-          Includes = includes
+    static member Zero() =
+        { Where =
+            let trueExpr = Expression.Constant(true)
+            let param = Expression.Parameter(typeof<'T>)
+            Expression.Lambda<Func<'T, bool>>(trueExpr, [| param |])
+          Includes = Seq.empty
           IncludeStrings = Seq.empty
           OrderBy = Seq.empty
           Skip = 0UL
           Take = None }
 
-    let Filtered where = Default(where, Seq.empty)
+module Specification =
+
+    let Filtered where =
+        { Where = where
+          Includes = Seq.empty
+          IncludeStrings = Seq.empty
+          OrderBy = Seq.empty
+          Skip = 0UL
+          Take = None }
 
     let Filter (where: FuncExpression<'T, bool>) spec =
         { spec with Where = Expression.Lambda<_>(Expression.AndAlso(spec.Where.Body, where.Body), spec.Where.Parameters) }

@@ -26,7 +26,7 @@ type CustomersRepository =
             |> Map.tryFind id
             |> Task.FromResult
 
-        member this.FindSpecified(spec: Specification.Specification<Customer>) : Task<seq<Customer>> =
+        member this.FindSpecified(spec: Specification<Customer>) : Task<seq<Customer>> =
             SpecificationEvaluator.evaluate spec this.customers.Values
 
         member this.Update(customer: Customer) : Task<bool> =

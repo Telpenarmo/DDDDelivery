@@ -7,7 +7,7 @@ open System.Threading.Tasks
 open DDDDelivery.Domain.Repositories
 
 module SpecificationEvaluator =
-    let evaluate<'Entity> (spec: Specification.Specification<'Entity>) seq =
+    let evaluate<'Entity> (spec: Specification<'Entity>) seq =
         let compile (f: Expression<Func<'Entity, 'To>>) = f.Compile() |> FuncConvert.FromFunc
 
         let where = compile spec.Where

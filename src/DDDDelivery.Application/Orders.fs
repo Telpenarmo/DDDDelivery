@@ -23,11 +23,11 @@ module private Common =
 
 module OrderSpecifications =
     let baseSpec =
-        Specification.Specification<Order>.Zero ()
+        Specification<Order>.Zero ()
         |> SpecificationsFsharp.Include <@ fun (o: Order) -> o.OrderLines @>
 
     let OrderedProductsSpec (order: Order) =
-        Specification.Specification<Product>.Zero ()
+        Specification<Product>.Zero ()
         |> SpecificationsFsharp.Filter
             <@ fun (p: Product) ->
                 order.OrderLines
@@ -239,8 +239,7 @@ module OrdersFetching =
         OrdersFromCustomerSpec customerId |> fetch uow
 
     let PendingForThreeDays (uow: IUnitOfWork) =
-        StaleOrdersSpec OrderStatus.Pending 3
-        |> fetch uow
+        StaleOrdersSpec OrderStatus.Pending 3 |> fetch uow
 
     let ProcessingForFiveDays (uow: IUnitOfWork) =
         StaleOrdersSpec OrderStatus.InPreparation 5

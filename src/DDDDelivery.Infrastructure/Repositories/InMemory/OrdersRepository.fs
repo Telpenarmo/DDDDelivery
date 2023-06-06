@@ -28,7 +28,7 @@ type OrdersRepository =
         member this.FindById(id: OrderId) : Task<Order option> =
             this.orders |> Map.tryFind id |> Task.FromResult
 
-        member this.FindSpecified(spec: Specification.Specification<Order>) : Task<seq<Order>> =
+        member this.FindSpecified(spec: Specification<Order>) : Task<seq<Order>> =
             SpecificationEvaluator.evaluate spec this.orders.Values
 
         member this.Update(order: Order) : Task<bool> =

@@ -4,8 +4,7 @@ open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
 
 module ProductsSpecifications =
-    let baseSpec = Specification.Specification<Product>.Zero
-
+    let baseSpec = Specification<Product>.Zero
 
 module Products =
 
