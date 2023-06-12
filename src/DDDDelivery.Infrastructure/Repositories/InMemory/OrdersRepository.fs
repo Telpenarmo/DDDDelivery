@@ -6,31 +6,22 @@ open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
 open DDDDelivery.Infrastructure.Repositories.InMemory
 
-type OrdersRepository =
-    val mutable orders: Map<OrderId, Order>
-
-    new() = { orders = Map.empty }
+type OrdersRepository() =
+    inherit RepositoryBase<OrderId, Order>()
 
     interface IOrdersRepository with
         member this.Insert creationData =
-            let id = OrderId(Map.count this.orders |> int64)
+            let id = OrderId(Map.count this.items |> int64)
 
             let order =
                 Order.create id creationData.CustomerId creationData.OrderLines creationData.ExpectedDeliveryDays
 
-            this.orders <- this.orders.Add(order.Id, order)
-            order |> Task.FromResult
+            ``base``.Insert(id, order)
 
-        member this.Delete(id: OrderId) : Task<bool> =
-            this.orders <- this.orders.Remove(id)
-            Task.FromResult(true)
+        member _.Delete(id: OrderId) : Task<bool> = base.Delete id
 
-        member this.FindById(id: OrderId) : Task<Order option> =
-            this.orders |> Map.tryFind id |> Task.FromResult
+        member _.FindById(id: OrderId) : Task<Order option> = base.FindById id
 
-        member this.FindSpecified(spec: Specification<Order>) : Task<seq<Order>> =
-            SpecificationEvaluator.evaluate spec this.orders.Values
+        member _.FindSpecified(spec: Specification<Order>) : Task<seq<Order>> = base.FindSpecified spec
 
-        member this.Update(order: Order) : Task<bool> =
-            this.orders <- this.orders.Add(order.Id, order)
-            Task.FromResult(true)
+        member _.Update(order: Order) : Task<bool> = ``base``.Update(order.Id, order)

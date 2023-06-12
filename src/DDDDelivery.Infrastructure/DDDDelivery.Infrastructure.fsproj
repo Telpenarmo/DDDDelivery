@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Repositories/InMemory/SpecificationEvaluator.fs" />
+    <Compile Include="Repositories/InMemory/RepositoryBase.fs" />
     <Compile Include="Repositories/InMemory/OrdersRepository.fs" />
     <Compile Include="Repositories/InMemory/ProductsRepository.fs" />
     <Compile Include="Repositories/InMemory/CustomersRepository.fs" />

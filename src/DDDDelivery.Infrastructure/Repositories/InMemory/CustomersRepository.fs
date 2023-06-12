@@ -6,29 +6,18 @@ open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
 open DDDDelivery.Infrastructure.Repositories.InMemory
 
-type CustomersRepository =
-    val mutable customers: Map<CustomerId, Customer>
-
-    new() = { customers = Map.empty }
-
+type CustomersRepository() =
+    inherit RepositoryBase<CustomerId, Customer>()
 
     interface ICustomersRepository with
-        member this.Insert(customer: Customer) : Task<bool> =
-            this.customers <- this.customers.Add(customer.Id, customer)
+        member this.Insert customer =
+            let id = CustomerId(Map.count this.items |> int64)
+
+            ``base``.Insert(id, customer) |> ignore
+
             Task.FromResult(true)
 
-        member this.Delete(id: CustomerId) : Task<bool> =
-            this.customers <- this.customers.Remove(id)
-            Task.FromResult(true)
-
-        member this.FindById(id: CustomerId) : Task<Customer option> =
-            this.customers
-            |> Map.tryFind id
-            |> Task.FromResult
-
-        member this.FindSpecified(spec: Specification<Customer>) : Task<seq<Customer>> =
-            SpecificationEvaluator.evaluate spec this.customers.Values
-
-        member this.Update(customer: Customer) : Task<bool> =
-            this.customers <- this.customers.Add(customer.Id, customer)
-            Task.FromResult(true)
+        member _.Delete(id: CustomerId) : Task<bool> = base.Delete id
+        member _.FindById(id: CustomerId) : Task<Customer option> = base.FindById id
+        member _.FindSpecified(spec: Specification<Customer>) : Task<seq<Customer>> = base.FindSpecified spec
+        member _.Update(customer: Customer) : Task<bool> = ``base``.Update(customer.Id, customer)

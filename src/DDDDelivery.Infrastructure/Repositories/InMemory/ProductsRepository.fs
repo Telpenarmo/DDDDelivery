@@ -4,35 +4,29 @@ open System.Threading.Tasks
 
 open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
+open DDDDelivery.Infrastructure.Repositories.InMemory
 
-type ProductsRepository =
+type ProductsRepository() =
 
-    val mutable products: Map<ProductId, Product>
-
-    new() = { products = Map.empty }
+    inherit RepositoryBase<ProductId, Product>()
 
     interface IProductsRepository with
-        member this.Insert(product: Product) : Task<bool> =
-            this.products <- this.products.Add(product.Id, product)
+
+        member this.Insert product =
+            let id = ProductId(Map.count this.items |> int64)
+
+            ``base``.Insert(id, product) |> ignore
+
             Task.FromResult(true)
 
-        member this.Delete(id: ProductId) : Task<bool> =
-            this.products <- this.products.Remove(id)
-            Task.FromResult(true)
+        member _.Delete(id: ProductId) : Task<bool> = base.Delete id
+        member _.FindById(id: ProductId) : Task<Product option> = base.FindById id
+        member _.FindSpecified(spec: Specification<Product>) : Task<seq<Product>> = base.FindSpecified spec
+        member _.Update(product: Product) : Task<bool> = ``base``.Update(product.Id, product)
 
-        member this.FindById(id: ProductId) : Task<Product option> =
-            this.products |> Map.tryFind id |> Task.FromResult
-
-        member this.FindSpecified(spec: Specification<Product>) : Task<seq<Product>> =
-            SpecificationEvaluator.evaluate spec this.products.Values
-
-        member this.Update(product: Product) : Task<bool> =
-            this.products <- this.products.Add(product.Id, product)
-            Task.FromResult(true)
-
-        member this.UpdateMany(items: seq<Product>) : Task<bool> =
-            this.products <-
-                items
-                |> Seq.fold (fun acc product -> acc.Add(product.Id, product)) this.products
+        member this.UpdateMany(products: seq<Product>) : Task<bool> =
+            products
+            |> Seq.map (fun p -> this.Update(p.Id, p))
+            |> ignore
 
             Task.FromResult(true)
