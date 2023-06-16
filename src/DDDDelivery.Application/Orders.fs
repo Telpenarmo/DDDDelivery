@@ -8,11 +8,11 @@ open DDDDelivery.Domain.Repositories
 [<AutoOpen>]
 module private Common =
 
-    let updateOrder (uow: IUnitOfWork) orderId onNotFound f =
+    let updateOrder (uow: IUnitOfWork) orderId onNotFound tryUpdate =
         task {
             match! uow.Orders.FindById orderId with
             | Some order ->
-                match f order with
+                match tryUpdate order with
                 | Ok order ->
                     let! _ = uow.Orders.Update order
                     do! uow.SaveChanges()
@@ -22,6 +22,7 @@ module private Common =
         }
 
 module OrderSpecifications =
+    
     let baseSpec =
         Specification<Order>.Zero ()
         |> SpecificationsFsharp.Include <@ fun (o: Order) -> o.OrderLines @>

@@ -33,7 +33,6 @@ type Order =
       // TODO: shipment:
       OrderLines: OrderLine seq
       OrderedAt: DateTime
-      ExpectedShipmentTime: DateTime
       ModifiedAt: DateTime }
 
     override this.Equals(other) =
@@ -56,15 +55,12 @@ module Order =
         | CancelledByCustomer _
         | CancelledByStore _ -> Inactive
 
-    let create id customerId orderLines expectedDeliveryDays =
+    let create id customerId orderLines =
         { Id = id
           Status = Pending
           Customer = customerId
           OrderLines = orderLines
           OrderedAt = DateTime.Now
-          ExpectedShipmentTime =
-            let expectedDeliveryTime = expectedDeliveryDays |> TimeSpan.FromDays
-            DateTime.Now + expectedDeliveryTime
           ModifiedAt = DateTime.Now }
 
     module Commands =

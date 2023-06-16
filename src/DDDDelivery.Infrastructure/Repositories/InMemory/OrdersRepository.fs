@@ -14,7 +14,7 @@ type OrdersRepository() =
             let id = OrderId(Map.count this.items |> int64)
 
             let order =
-                Order.create id creationData.CustomerId creationData.OrderLines creationData.ExpectedDeliveryDays
+                Order.create id creationData.CustomerId creationData.OrderLines
 
             ``base``.Insert(id, order)
 

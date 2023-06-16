@@ -9,8 +9,7 @@ open Specification
 type CreationData =
     { Id: OrderId option
       CustomerId: CustomerId
-      OrderLines: OrderLine seq
-      ExpectedDeliveryDays: int }
+      OrderLines: OrderLine seq }
 
 type IOrdersRepository =
     abstract member Insert: CreationData -> Task<Order>
