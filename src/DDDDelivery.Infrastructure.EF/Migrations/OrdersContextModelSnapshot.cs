@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DDDDelivery.Infrastructure.EF.Migrations
 {
-    [DbContext(typeof(OrdersContext))]
+    [DbContext(typeof(DDDDeliveryContext))]
     partial class OrdersContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

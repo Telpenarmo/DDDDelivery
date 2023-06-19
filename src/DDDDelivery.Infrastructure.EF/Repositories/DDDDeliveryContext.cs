@@ -1,14 +1,19 @@
 using DDDDelivery.Domain;
+using DDDDelivery.Domain.HelperTypes;
 using DDDDelivery.Infrastructure.EF.Repositories.Dtos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DDDDelivery.Infrastructure.EF.Repositories;
 
-public class OrdersContext : DbContext
+public class DDDDeliveryContext : DbContext
 {
     public string DbPath { get; init; }
+    public DbSet<OrderDto> Orders { get; set; } = null!;
+    public DbSet<ProductDto> Products { get; set; } = null!;
+    public DbSet<CustomerDto> Customers { get; set; } = null!;
 
-    public OrdersContext()
+    public DDDDeliveryContext()
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);

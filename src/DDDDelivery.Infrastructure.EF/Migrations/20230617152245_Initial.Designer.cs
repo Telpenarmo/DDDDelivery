@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DDDDelivery.Infrastructure.EF.Migrations
 {
-    [DbContext(typeof(OrdersContext))]
+    [DbContext(typeof(DDDDeliveryContext))]
     [Migration("20230617152245_Initial")]
     partial class Initial
     {
