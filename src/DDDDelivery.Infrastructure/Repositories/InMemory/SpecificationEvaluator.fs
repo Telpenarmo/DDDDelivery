@@ -15,12 +15,12 @@ module SpecificationEvaluator =
         let notOrdered =
             seq
             |> Seq.filter where
-            |> Seq.skip (int spec.Skip)
 
         let notPaginated =
             spec.OrderBy
             |> Seq.map compile
             |> Seq.fold (fun seq projection -> seq |> Seq.sortBy projection) notOrdered
+            |> Seq.skip (int spec.Skip)
 
         let res =
             match spec.Take with

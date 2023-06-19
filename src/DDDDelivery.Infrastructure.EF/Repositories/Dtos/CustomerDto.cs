@@ -3,22 +3,29 @@ using DDDDelivery.Domain.HelperTypes;
 
 namespace DDDDelivery.Infrastructure.EF.Repositories.Dtos;
 
-public class CustomerDto
+public class CustomerDto : IDto<Customer>
 {
     public long Id { get; set; }
     public string Name { get; set; } = "";
     public ContactInfoDto PrimaryContactInfo { get; set; } = null!;
     public ContactInfoDto? SecondaryContactInfo { get; set; }
 
-    public static CustomerDto From(Customer customer)
+    public void CopyFrom(Customer customer)
     {
-        return new CustomerDto
-        {
-            Id = customer.Id.Item,
-            Name = customer.Name,
-            PrimaryContactInfo = ContactInfoDto.From(customer.PrimaryContactInfo),
-            SecondaryContactInfo = customer.SecondaryContactInfo is null ? ContactInfoDto.From(customer.SecondaryContactInfo!.Value) : null,
-        };
+        Id = customer.Id.Item;
+        Name = customer.Name;
+        PrimaryContactInfo = ContactInfoDto.From(customer.PrimaryContactInfo);
+        SecondaryContactInfo = customer.SecondaryContactInfo is null ? ContactInfoDto.From(customer.SecondaryContactInfo!.Value) : null;
+    }
+
+    public Customer ToEntity()
+    {
+        return new Customer(
+            CustomerId.NewCustomerId(Id),
+            Name,
+            ContactInfoDto.To(PrimaryContactInfo),
+            SecondaryContactInfo is null ? null : ContactInfoDto.To(this.SecondaryContactInfo!)
+        );
     }
 }
 
