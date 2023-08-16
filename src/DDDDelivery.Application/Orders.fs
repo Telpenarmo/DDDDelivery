@@ -21,41 +21,6 @@ module private Common =
             | None -> return Error(onNotFound orderId)
         }
 
-module OrderSpecifications =
-    
-    let baseSpec =
-        Specification<Order>.Zero ()
-        |> SpecificationsFsharp.Include <@ fun (o: Order) -> o.OrderLines @>
-
-    let OrderedProductsSpec (order: Order) =
-        Specification<Product>.Zero ()
-        |> SpecificationsFsharp.Filter
-            <@ fun (p: Product) ->
-                order.OrderLines
-                |> Seq.exists (fun ol -> ol.Product = p.Id) @>
-
-    let AllOrdersSpec () = baseSpec
-
-    let OrdersWithProductSpec (productId: ProductId) =
-        baseSpec
-        |> SpecificationsFsharp.Filter
-            <@ fun (o: Order) ->
-                o.OrderLines
-                |> Seq.exists (fun ol -> ol.Product = productId) @>
-
-    let OrdersFromCustomerSpec (customerId: CustomerId) =
-        baseSpec
-        |> SpecificationsFsharp.Filter <@ fun (o: Order) -> o.Customer = customerId @>
-
-    let StaleOrdersSpec status days =
-        baseSpec
-        |> SpecificationsFsharp.Filter
-            <@ fun (o: Order) ->
-                o.Status = status
-                && DateTime.Now - o.OrderedAt > TimeSpan.FromDays(float days) @>
-
-open OrderSpecifications
-
 module OrderCreation =
 
     type CreationError =
@@ -77,7 +42,7 @@ module OrderCreation =
                     None
                 | None -> Some product.Id
 
-            let! products = uow.Products.FindSpecified(OrderedProductsSpec order)
+            let! products = failwith "Not implemented"
             let unavailableProducts = products |> Seq.choose tryReserveProduct
 
             if unavailableProducts |> Seq.isEmpty then
@@ -103,7 +68,7 @@ module OrderCancellation =
             product.AvailableUnits <- product.AvailableUnits + orderLine.Amount
 
         task {
-            let! products = uow.Products.FindSpecified(OrderedProductsSpec order)
+            let! products = failwith "Not implemented"
             products |> Seq.iter returnProduct
             let! _ = uow.Products.UpdateMany products
             return ()
@@ -225,27 +190,4 @@ module OrderDelivery =
 
 module OrdersFetching =
 
-    let private fetch (uow: IUnitOfWork) spec =
-        task {
-            let! orders = uow.Orders.FindSpecified(spec)
-            return orders
-        }
-
-    let All (uow: IUnitOfWork) = AllOrdersSpec() |> fetch uow
-
-    let WithProduct (uow: IUnitOfWork) productId =
-        OrdersWithProductSpec productId |> fetch uow
-
-    let WithCustomer (uow: IUnitOfWork) customerId =
-        OrdersFromCustomerSpec customerId |> fetch uow
-
-    let PendingForThreeDays (uow: IUnitOfWork) =
-        StaleOrdersSpec OrderStatus.Pending 3 |> fetch uow
-
-    let ProcessingForFiveDays (uow: IUnitOfWork) =
-        StaleOrdersSpec OrderStatus.InPreparation 5
-        |> fetch uow
-
-    let AwaitingShipmentForTwoDays (uow: IUnitOfWork) =
-        StaleOrdersSpec OrderStatus.AwaitingShipment 2
-        |> fetch uow
+    let All (uow: IUnitOfWork) = uow.Orders.FindAll()

@@ -2,11 +2,6 @@ namespace DDDDelivery.Application
 
 open DDDDelivery.Domain
 
-module CustomersSpecifications =
-    open DDDDelivery.Domain.Repositories
-
-    let baseSpec = Specification<Customer>.Zero
-
 module Customers =
     open DDDDelivery.Domain.Repositories
 
@@ -39,4 +34,4 @@ module Customers =
         }
 
     let getCustomers (uow: IUnitOfWork) =
-        uow.Customers.FindSpecified(CustomersSpecifications.baseSpec ())
+        uow.Customers.FindAll ()

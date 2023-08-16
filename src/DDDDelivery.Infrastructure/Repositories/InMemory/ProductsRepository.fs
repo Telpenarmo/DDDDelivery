@@ -21,7 +21,7 @@ type ProductsRepository() =
 
         member _.Delete(id: ProductId) : Task<bool> = base.Delete id
         member _.FindById(id: ProductId) : Task<Product option> = base.FindById id
-        member _.FindSpecified(spec: Specification<Product>) : Task<seq<Product>> = base.FindSpecified spec
+        member _.FindAll() : Task<seq<Product>> = base.FindAll ()
         member _.Update(product: Product) : Task<bool> = ``base``.Update(product.Id, product)
 
         member this.UpdateMany(products: seq<Product>) : Task<bool> =

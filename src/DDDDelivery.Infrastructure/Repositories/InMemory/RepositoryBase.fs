@@ -4,8 +4,6 @@ open System.Threading.Tasks
 
 open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
-open DDDDelivery.Infrastructure.Repositories.InMemory
-
 
 [<AbstractClass>]
 type RepositoryBase<'Id, 'Entity> when 'Id: comparison =
@@ -24,8 +22,7 @@ type RepositoryBase<'Id, 'Entity> when 'Id: comparison =
     member this.FindById(id: 'Id) : Task<'Entity option> =
         this.items |> Map.tryFind id |> Task.FromResult
 
-    member this.FindSpecified(spec: Specification<'Entity>) : Task<seq<'Entity>> =
-        SpecificationEvaluator.evaluate spec this.items.Values
+    member this.FindAll() : Task<seq<'Entity>> = Task.FromResult <| upcast this.items.Values
     
     member this.Update(id: 'Id, item: 'Entity) : Task<bool> =
         this.items <- this.items.Add(id, item)

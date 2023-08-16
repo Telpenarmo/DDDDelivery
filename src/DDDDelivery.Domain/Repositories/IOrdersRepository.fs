@@ -4,8 +4,6 @@ open DDDDelivery.Domain
 
 open System.Threading.Tasks
 
-open Specification
-
 type CreationData =
     { Id: OrderId option
       CustomerId: CustomerId
@@ -14,6 +12,6 @@ type CreationData =
 type IOrdersRepository =
     abstract member Insert: CreationData -> Task<Order>
     abstract member FindById: OrderId -> Task<Order option>
-    abstract member FindSpecified: Specification<Order> -> Task<seq<Order>>
+    abstract member FindAll: unit -> Task<Order seq>
     abstract member Update: Order -> Task<bool>
     abstract member Delete: OrderId -> Task<bool>

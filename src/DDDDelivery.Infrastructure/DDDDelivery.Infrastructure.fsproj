@@ -1,20 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\DDDDelivery.Domain\DDDDelivery.Domain.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Repositories/InMemory/SpecificationEvaluator.fs" />
     <Compile Include="Repositories/InMemory/RepositoryBase.fs" />
     <Compile Include="Repositories/InMemory/OrdersRepository.fs" />
     <Compile Include="Repositories/InMemory/ProductsRepository.fs" />
     <Compile Include="Repositories/InMemory/CustomersRepository.fs" />
     <Compile Include="Repositories/InMemory/UnitOfWork.fs" />
   </ItemGroup>
-  
 </Project>

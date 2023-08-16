@@ -3,9 +3,6 @@ namespace DDDDelivery.Application
 open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
 
-module ProductsSpecifications =
-    let baseSpec = Specification<Product>.Zero
-
 module Products =
 
     let createProduct (uow: IUnitOfWork) product =
@@ -37,4 +34,4 @@ module Products =
         }
 
     let getProducts (uow: IUnitOfWork) =
-        uow.Products.FindSpecified(ProductsSpecifications.baseSpec ())
+        uow.Products.FindAll()

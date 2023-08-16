@@ -19,5 +19,5 @@ type CustomersRepository() =
 
         member _.Delete(id: CustomerId) : Task<bool> = base.Delete id
         member _.FindById(id: CustomerId) : Task<Customer option> = base.FindById id
-        member _.FindSpecified(spec: Specification<Customer>) : Task<seq<Customer>> = base.FindSpecified spec
+        member _.FindAll() : Task<seq<Customer>> = base.FindAll ()
         member _.Update(customer: Customer) : Task<bool> = ``base``.Update(customer.Id, customer)
