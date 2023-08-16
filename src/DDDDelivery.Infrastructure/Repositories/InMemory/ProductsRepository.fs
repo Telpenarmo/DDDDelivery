@@ -20,8 +20,16 @@ type ProductsRepository() =
             Task.FromResult(true)
 
         member _.Delete(id: ProductId) : Task<bool> = base.Delete id
+
         member _.FindById(id: ProductId) : Task<Product option> = base.FindById id
-        member _.FindAll() : Task<seq<Product>> = base.FindAll ()
+
+        member _.FindAll() : Task<seq<Product>> = base.FindAll()
+
+        member this.FindMany(ids: seq<ProductId>) : Task<seq<Product>> =
+            this.items.Values
+            |> Seq.filter (fun p -> ids |> Seq.exists (fun arg -> arg = p.Id))
+            |> Task.FromResult
+
         member _.Update(product: Product) : Task<bool> = ``base``.Update(product.Id, product)
 
         member this.UpdateMany(products: seq<Product>) : Task<bool> =

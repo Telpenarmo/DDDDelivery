@@ -21,6 +21,11 @@ module private Common =
             | None -> return Error(onNotFound orderId)
         }
 
+    let getProductsInOrder (uow: IUnitOfWork) (order: Order) =
+        order.OrderLines
+        |> Seq.map (fun ol -> ol.Product)
+        |> uow.Products.FindMany
+
 module OrderCreation =
 
     type CreationError =
@@ -42,7 +47,7 @@ module OrderCreation =
                     None
                 | None -> Some product.Id
 
-            let! products = failwith "Not implemented"
+            let! products = getProductsInOrder uow order
             let unavailableProducts = products |> Seq.choose tryReserveProduct
 
             if unavailableProducts |> Seq.isEmpty then
@@ -68,7 +73,7 @@ module OrderCancellation =
             product.AvailableUnits <- product.AvailableUnits + orderLine.Amount
 
         task {
-            let! products = failwith "Not implemented"
+            let! products = getProductsInOrder uow order
             products |> Seq.iter returnProduct
             let! _ = uow.Products.UpdateMany products
             return ()
@@ -191,3 +196,16 @@ module OrderDelivery =
 module OrdersFetching =
 
     let All (uow: IUnitOfWork) = uow.Orders.FindAll()
+
+    let WithProduct (uow: IUnitOfWork) = uow.Orders.FindOrdersWithProduct
+
+    let WithCustomer (uow: IUnitOfWork) = uow.Orders.FindOrdersFromCustomer
+
+    let PendingForThreeDays (uow: IUnitOfWork) =
+        uow.Orders.FindStaleOrders OrderStatus.Pending 3
+
+    let ProcessingForFiveDays (uow: IUnitOfWork) =
+        uow.Orders.FindStaleOrders OrderStatus.InPreparation 5
+
+    let AwaitingShipmentForTwoDays (uow: IUnitOfWork) =
+        uow.Orders.FindStaleOrders OrderStatus.AwaitingShipment 2
