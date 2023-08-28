@@ -12,8 +12,8 @@ type OrderLine =
       Discount: float }
 
 type CancellationReason = { Reason: string }
-type ShipmentId = { Id: string }
 
+type ShipmentId = { Id: string }
 
 module OrderStatus =
     type T =
@@ -25,6 +25,10 @@ module OrderStatus =
         | CancelledByCustomer of CancellationReason
         | CancelledByStore of CancellationReason
 
+type OrderForm =
+    { CustomerId: CustomerId
+      OrderLines: OrderLine seq }
+   
 [<CustomEquality; NoComparison>]
 type Order =
     { Id: OrderId
@@ -55,11 +59,11 @@ module Order =
         | CancelledByCustomer _
         | CancelledByStore _ -> Inactive
 
-    let create id customerId orderLines =
-        { Id = id
+    let create (form: OrderForm) (getId: unit -> OrderId) =
+        { Id = getId ()
           Status = Pending
-          Customer = customerId
-          OrderLines = orderLines
+          Customer = form.CustomerId
+          OrderLines = form.OrderLines
           OrderedAt = DateTime.Now
           ModifiedAt = DateTime.Now }
 

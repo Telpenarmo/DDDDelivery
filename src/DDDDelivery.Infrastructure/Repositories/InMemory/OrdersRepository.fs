@@ -10,10 +10,10 @@ type OrdersRepository() =
     inherit RepositoryBase<OrderId, Order>()
 
     interface IOrdersRepository with
-        member this.Insert creationData =
+        member this.Insert form =
             let id = OrderId(Map.count this.items |> int64)
 
-            let order = Order.create id creationData.CustomerId creationData.OrderLines
+            let order = Order.create form (fun _ -> id)
 
             ``base``.Insert(id, order)
 
