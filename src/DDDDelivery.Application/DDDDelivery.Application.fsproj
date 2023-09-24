@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="Customers.fs" />
     <Compile Include="Products.fs" />
+    <Compile Include="Orders.fsi" />
     <Compile Include="Orders.fs" />
   </ItemGroup>
 </Project>
