@@ -79,7 +79,7 @@ module OrderCancellation =
             return ()
         }
 
-    let private cancel cancelCommand (uow: IUnitOfWork) ((OrderId id) as orderId) =
+    let private cancel cancelCommand (uow: IUnitOfWork) ((OrderId id) as orderId) timestamp =
         let doCancel order =
             task {
                 uow.Orders.Update order |> ignore
@@ -90,7 +90,7 @@ module OrderCancellation =
         task {
             match! uow.Orders.FindById orderId with
             | Some order ->
-                match cancelCommand order with
+                match cancelCommand (order, timestamp) with
                 | Some order ->
                     do! doCancel order
                     return Ok order
@@ -98,11 +98,11 @@ module OrderCancellation =
             | None -> return (Error OrderNotFound)
         }
 
-    let cancelByCustomer reason =
-        cancel (Order.Commands.customerCancelled reason)
+    let cancelByCustomer reason uow id =
+        cancel (Order.Commands.customerCancelled reason) uow id DateTime.Now
 
-    let cancelBySeller reason =
-        cancel (Order.Commands.storeCancelled reason)
+    let cancelBySeller reason uow id =
+        cancel (Order.Commands.storeCancelled reason) uow id DateTime.Now
 
 module OrderAcceptance =
 
@@ -121,7 +121,7 @@ module OrderAcceptance =
         task {
             match! uow.Orders.FindById orderId with
             | Some order ->
-                match Order.Commands.accepted order with
+                match Order.Commands.accepted (order, DateTime.Now) with
                 | Some order ->
                     do! doAccept order
                     return Ok order
@@ -146,7 +146,7 @@ module OrderPreparation =
         task {
             match! uow.Orders.FindById orderId with
             | Some order ->
-                match Order.Commands.prepared order with
+                match Order.Commands.prepared (order, DateTime.Now) with
                 | Some order ->
                     do! doPrepare order
                     return Ok order
@@ -171,7 +171,7 @@ module OrderShipment =
         task {
             match! uow.Orders.FindById orderId with
             | Some order ->
-                match Order.Commands.shipped shipmentId order with
+                match Order.Commands.shipped shipmentId (order, DateTime.Now) with
                 | Some order ->
                     do! doShip order
                     return Ok order
@@ -187,7 +187,7 @@ module OrderDelivery =
 
     let deliver (uow: IUnitOfWork) ((OrderId id) as orderId) =
         let doDeliver order =
-            match Order.Commands.delivered order with
+            match Order.Commands.delivered (order, DateTime.Now) with
             | Some order -> Ok order
             | None -> Error OrderNotDeliverable
 

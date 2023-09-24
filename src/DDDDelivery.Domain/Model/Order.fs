@@ -27,8 +27,9 @@ module OrderStatus =
 
 type OrderForm =
     { CustomerId: CustomerId
-      OrderLines: OrderLine seq }
-   
+      OrderLines: OrderLine seq
+      OrderedAt: DateTime }
+
 [<CustomEquality; NoComparison>]
 type Order =
     { Id: OrderId
@@ -59,22 +60,23 @@ module Order =
         | CancelledByCustomer _
         | CancelledByStore _ -> Inactive
 
-    let create (form: OrderForm) (getId: unit -> OrderId) =
+    let placeForm (form: OrderForm) (getId: unit -> OrderId) =
         { Id = getId ()
           Status = Pending
           Customer = form.CustomerId
           OrderLines = form.OrderLines
-          OrderedAt = DateTime.Now
-          ModifiedAt = DateTime.Now }
+          OrderedAt = form.OrderedAt
+          ModifiedAt = form.OrderedAt }
 
     module Commands =
-        type Command = Order -> Order option
 
-        let private changeStatus f order =
+        type Command = (Order * DateTime) -> Order option
+
+        let private changeStatus f (order, timestamp) =
             f order.Status
             |> Option.map (fun status ->
                 { order with
-                    ModifiedAt = DateTime.Now
+                    ModifiedAt = timestamp
                     Status = status })
 
         let private advanceTo next expected actual =

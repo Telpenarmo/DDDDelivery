@@ -13,7 +13,7 @@ type OrdersRepository() =
         member this.Insert form =
             let id = OrderId(Map.count this.items |> int64)
 
-            let order = Order.create form (fun _ -> id)
+            let order = Order.placeForm form (fun _ -> id)
 
             ``base``.Insert(id, order)
 
