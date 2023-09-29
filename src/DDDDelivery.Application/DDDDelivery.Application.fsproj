@@ -9,7 +9,9 @@
     <ProjectReference Include="..\DDDDelivery.Domain\DDDDelivery.Domain.fsproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Customers.fsi" />
     <Compile Include="Customers.fs" />
+    <Compile Include="Products.fsi" />
     <Compile Include="Products.fs" />
     <Compile Include="Orders.fsi" />
     <Compile Include="Orders.fs" />

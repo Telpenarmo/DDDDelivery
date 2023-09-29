@@ -1,37 +1,41 @@
 namespace DDDDelivery.Application
 
+open System.Threading.Tasks
+
 open DDDDelivery.Domain
+open DDDDelivery.Domain.Repositories
 
 module Customers =
-    open DDDDelivery.Domain.Repositories
 
-    let createCustomer (uow: IUnitOfWork) customer =
+    type CustomerCommand<'Input, 'Output> = IUnitOfWork -> 'Input -> Task<'Output>
+    type CustomerQuery<'Input> = IUnitOfWork -> 'Input -> Task<Customer seq>
+
+    let create (uow: IUnitOfWork) (customer: Customer) =
         task {
-            let! _ = uow.Customers.Insert customer
+            let! _added = uow.Customers.Insert customer
             do! uow.SaveChanges()
-            return Ok customer
+            return customer
         }
 
-    let updateCustomer (uow: IUnitOfWork) customer =
+    let update (uow: IUnitOfWork) (customer: Customer) =
         task {
-            let! _ = uow.Customers.Update customer
+            let! _updated = uow.Customers.Update customer
             do! uow.SaveChanges()
-            return Ok customer
+            return customer
         }
 
-    let deleteCustomer (uow: IUnitOfWork) customerId =
+    let delete (uow: IUnitOfWork) customerId =
         task {
-            let! _ = uow.Customers.Delete customerId
+            let! _deleted = uow.Customers.Delete customerId
             do! uow.SaveChanges()
-            return Ok()
+            return ()
         }
 
-    let getCustomer (uow: IUnitOfWork) customerId =
+    let getById (uow: IUnitOfWork) (customerId: CustomerId) =
         task {
             match! uow.Customers.FindById customerId with
-            | Some customer -> return Ok customer
-            | None -> return Error(sprintf "Customer with id %A not found" customerId)
+            | Some customer -> return Some customer
+            | None -> return None
         }
 
-    let getCustomers (uow: IUnitOfWork) =
-        uow.Customers.FindAll ()
+    let getAll (uow: IUnitOfWork) = uow.Customers.FindAll

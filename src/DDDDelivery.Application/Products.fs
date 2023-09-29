@@ -1,37 +1,41 @@
 namespace DDDDelivery.Application
 
+open System.Threading.Tasks
+
 open DDDDelivery.Domain
 open DDDDelivery.Domain.Repositories
 
 module Products =
 
-    let createProduct (uow: IUnitOfWork) product =
+    type ProductCommand<'Input, 'Output> = IUnitOfWork -> 'Input -> Task<'Output>
+    type ProductQuery<'Input> = IUnitOfWork -> 'Input -> Task<Product seq>
+
+    let create (uow: IUnitOfWork) (product: Product) =
         task {
             let! _ = uow.Products.Insert product
             do! uow.SaveChanges()
-            return Ok product
+            return product
         }
 
-    let updateProduct (uow: IUnitOfWork) product =
+    let update (uow: IUnitOfWork) (product: Product) =
         task {
             let! _ = uow.Products.Update product
             do! uow.SaveChanges()
-            return Ok product
+            return product
         }
 
-    let deleteProduct (uow: IUnitOfWork) productId =
+    let delete (uow: IUnitOfWork) productId =
         task {
             let! _ = uow.Products.Delete productId
             do! uow.SaveChanges()
-            return Ok()
+            return ()
         }
 
-    let getProduct (uow: IUnitOfWork) productId =
+    let getById (uow: IUnitOfWork) productId =
         task {
             match! uow.Products.FindById productId with
-            | Some product -> return Ok product
-            | None -> return Error(sprintf "Product with id %A not found" productId)
+            | Some product -> return Some product
+            | None -> return None
         }
 
-    let getProducts (uow: IUnitOfWork) =
-        uow.Products.FindAll()
+    let getAll (uow: IUnitOfWork) = uow.Products.FindAll
