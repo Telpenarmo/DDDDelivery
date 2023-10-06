@@ -12,27 +12,7 @@ open Microsoft.Extensions.DependencyInjection
 
 open Giraffe
 
-// ---------------------------------
-// Models
-// ---------------------------------
-
-type Message = { Text: string }
-let message msg = { Text = msg }
-
-// ---------------------------------
-// Web app
-// ---------------------------------
-
-let indexHandler (name: string) =
-    sprintf "Hello %s, from Giraffe!" name
-    |> message
-    |> json
-
-let webApp =
-    choose [ GET
-             >=> choose [ route "/" >=> indexHandler "world"
-                          routef "/hello/%s" indexHandler ]
-             setStatusCode 404 >=> text "Not Found" ]
+let webApp = setStatusCode 404 >=> text "Not Found"
 
 // ---------------------------------
 // Error handler
