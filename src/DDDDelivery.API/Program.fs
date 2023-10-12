@@ -10,6 +10,8 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 
 open Giraffe
+open DDDDelivery.Domain.Repositories
+open DDDDelivery.Infrastructure.Repositories
 
 let webApp = setStatusCode 404 >=> text "Not Found"
 
@@ -51,6 +53,8 @@ let configureApp (app: IApplicationBuilder) =
 let configureServices (services: IServiceCollection) =
     services.AddCors() |> ignore
     services.AddGiraffe() |> ignore
+
+    services.AddSingleton<IUnitOfWork, InMemory.UnitOfWork>() |> ignore
 
 let configureLogging (builder: ILoggingBuilder) =
     builder.AddConsole().AddDebug() |> ignore
