@@ -1,7 +1,6 @@
 module DDDDelivery.Rest.App
 
 open System
-open System.IO
 
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
@@ -58,20 +57,15 @@ let configureLogging (builder: ILoggingBuilder) =
 
 [<EntryPoint>]
 let main args =
-    let contentRoot = Directory.GetCurrentDirectory()
-    let webRoot = Path.Combine(contentRoot, "WebRoot")
+    let builder = WebApplication.CreateBuilder(args)
 
-    Host
-        .CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(fun webHostBuilder ->
-            webHostBuilder
-                .UseContentRoot(contentRoot)
-                .UseWebRoot(webRoot)
-                .Configure(Action<_> configureApp)
-                .ConfigureServices(configureServices)
-                .ConfigureLogging(configureLogging)
-            |> ignore)
-        .Build()
-        .Run()
+    configureServices builder.Services
+    configureLogging builder.Logging
+
+    let app = builder.Build()
+
+    configureApp app
+
+    app.Run()
 
     0
