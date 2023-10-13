@@ -5,9 +5,7 @@ module Email =
 
     type Email = private Email of string
 
-    let (|Email|) =
-        function
-        | Email email -> email
+    let (|Email|) (Email email) = email
 
     let createEmail email =
         let valid email =
