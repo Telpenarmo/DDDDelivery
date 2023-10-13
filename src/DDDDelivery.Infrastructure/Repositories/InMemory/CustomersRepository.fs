@@ -12,6 +12,7 @@ type CustomersRepository() =
     interface ICustomersRepository with
         member this.Insert customer =
             let id = CustomerId(Map.count this.items |> int64)
+            let customer = Customer(id, customer.Name, customer.PrimaryContactInfo, customer.SecondaryContactInfo)
 
             ``base``.Insert(id, customer) |> ignore
 

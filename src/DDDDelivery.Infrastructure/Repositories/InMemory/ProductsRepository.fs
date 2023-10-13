@@ -14,6 +14,7 @@ type ProductsRepository() =
 
         member this.Insert product =
             let id = ProductId(Map.count this.items |> int64)
+            let product = Product(id, product.Name, product.Description, product.Price, product.AvailableUnits)
 
             ``base``.Insert(id, product) |> ignore
 
