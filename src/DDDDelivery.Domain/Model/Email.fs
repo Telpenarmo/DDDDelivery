@@ -1,12 +1,9 @@
-namespace DDDDelivery.Domain.HelperTypes
+namespace DDDDelivery.Domain
 
 [<AutoOpen>]
 module Email =
 
-    type Email =
-        private
-        | Email of string
-        override this.ToString() = this.ToString()
+    type Email = private Email of string
 
     let (|Email|) =
         function
@@ -21,15 +18,15 @@ module Email =
         else
             None
 
-    let toString (Email email) = email
+[<AutoOpen>]
+module ContactInfo =
+    type Address =
+        { Street: string
+          City: string
+          PostalCode: string }
 
-type Address =
-    { Street: string
-      City: string
-      PostalCode: string }
+    type PhoneNumber = PhoneNumber of string
 
-type Phone = Phone of string
-
-type ContactInfo =
-    | Email of Email
-    | Phone of Phone
+    type ContactInfo =
+        | Email of Email
+        | Phone of PhoneNumber

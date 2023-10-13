@@ -1,7 +1,5 @@
 namespace DDDDelivery.Domain
 
-open DDDDelivery.Domain.HelperTypes
-
 type CustomerId = CustomerId of int64
 
 [<NoEquality; NoComparison>]
