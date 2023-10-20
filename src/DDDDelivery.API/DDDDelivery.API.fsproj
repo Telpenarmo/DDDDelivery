@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="Common.fs" />
     <Compile Include="CustomersEndpoints.fs" />
+    <Compile Include="OrdersEndpoints.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

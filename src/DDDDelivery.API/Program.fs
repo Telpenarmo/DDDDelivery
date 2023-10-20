@@ -14,7 +14,8 @@ open DDDDelivery.Domain.Repositories
 open DDDDelivery.Infrastructure.Repositories
 
 let webApp =
-    choose [ createEndpointsHandler<CustomersEndpoints>()
+    choose [ createEndpointsHandler<CustomersEndpoints> ()
+             createEndpointsHandler<OrdersEndpoints> ()
              setStatusCode 404 >=> text "Not Found" ]
 
 // ---------------------------------
