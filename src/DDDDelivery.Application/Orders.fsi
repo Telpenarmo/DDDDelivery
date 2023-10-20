@@ -13,6 +13,7 @@ module Orders =
 
     module OrderCreation =
 
+        [<AutoOpen>]
         type CreationError =
             | CustomerNotFound of CustomerId
             | NotEnoughProductsAvailable of ProductId seq
@@ -21,6 +22,7 @@ module Orders =
 
     module OrderCancellation =
 
+        [<AutoOpen>]
         type CancellationError =
             | OrderNotFound
             | OrderNotCancellable
@@ -33,6 +35,7 @@ module Orders =
 
     module OrderAcceptance =
 
+        [<AutoOpen>]
         type AcceptanceError =
             | OrderNotFound
             | OrderNotAcceptable
@@ -41,6 +44,7 @@ module Orders =
 
     module OrderPreparation =
 
+        [<AutoOpen>]
         type PreparationError =
             | OrderNotFound
             | OrderNotPreparable
@@ -49,6 +53,7 @@ module Orders =
 
     module OrderShipment =
 
+        [<AutoOpen>]
         type ShipmentError =
             | OrderNotFound
             | OrderNotShippable
@@ -59,6 +64,7 @@ module Orders =
 
     module OrderDelivery =
 
+        [<AutoOpen>]
         type DeliveryError =
             | OrderNotFound
             | OrderNotDeliverable
