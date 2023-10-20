@@ -1,4 +1,4 @@
-module DDDDelivery.Rest.App
+module DDDDelivery.API.Program
 
 open System
 
@@ -13,7 +13,9 @@ open Giraffe
 open DDDDelivery.Domain.Repositories
 open DDDDelivery.Infrastructure.Repositories
 
-let webApp = setStatusCode 404 >=> text "Not Found"
+let webApp =
+    choose [ createEndpointsHandler<CustomersEndpoints>()
+             setStatusCode 404 >=> text "Not Found" ]
 
 // ---------------------------------
 // Error handler
@@ -54,7 +56,8 @@ let configureServices (services: IServiceCollection) =
     services.AddCors() |> ignore
     services.AddGiraffe() |> ignore
 
-    services.AddSingleton<IUnitOfWork, InMemory.UnitOfWork>() |> ignore
+    services.AddSingleton<IUnitOfWork, InMemory.UnitOfWork>()
+    |> ignore
 
 let configureLogging (builder: ILoggingBuilder) =
     builder.AddConsole().AddDebug() |> ignore
