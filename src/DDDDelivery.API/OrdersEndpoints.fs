@@ -1,6 +1,31 @@
 namespace DDDDelivery.API
 
+open System
+
 open Giraffe
+
+module private Handlers =
+    open DDDDelivery.Domain.Repositories
+    open DDDDelivery.Application.Orders
+    open DDDDelivery.Domain
+
+    let accept (uow: IUnitOfWork) id =
+        task {
+            match! OrderAcceptance.accept uow (OrderId id, DateTime.Now) with
+            | Ok order -> return serialize order
+            | Error OrderAcceptance.OrderNotFound -> return RequestErrors.notFound (text "Order not found")
+            | Error OrderAcceptance.OrderNotAcceptable ->
+                return RequestErrors.badRequest (text "Order is not acceptable")
+        }
+
+    let prepare (uow: IUnitOfWork) id =
+        task {
+            match! OrderPreparation.prepare uow (OrderId id, DateTime.Now) with
+            | Ok order -> return serialize order
+            | Error OrderPreparation.OrderNotFound -> return RequestErrors.notFound (text "Order not found")
+            | Error OrderPreparation.OrderNotPreparable ->
+                return RequestErrors.badRequest (text "Order is not preparable")
+        }
 
 type OrdersEndpoints =
     | Create
@@ -18,23 +43,17 @@ type OrdersEndpoints =
 
     member this.Handle() : HttpHandler =
         match this with
-        | Create ->
-            POST
-            >=> route "/create"
-            >=> notImplemented ()
+        | Create -> POST >=> route "/create" >=> notImplemented ()
 
         | Cancel ->
             PUT
-            >=> routeStartsWith "/cancel"
-            >=> notImplemented ()
+            >=> routef "/cancel/%d" (withUow Handlers.cancel)
         | Accept ->
             PUT
-            >=> routeStartsWith "/accept"
-            >=> notImplemented ()
+            >=> routef "/accept/%d" (withUow Handlers.accept)
         | Prepare ->
             PUT
-            >=> routeStartsWith "/prepare"
-            >=> notImplemented ()
+            >=> routef "/prepare/%d" (withUow Handlers.prepare)
         | Ship ->
             POST
             >=> routeStartsWith "/ship"
